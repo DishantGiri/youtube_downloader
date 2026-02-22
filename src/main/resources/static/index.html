@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader - YTDown</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF0000;
+            --secondary: #282828;
+            --accent: #FF4D4D;
+            --bg: #0f0f0f;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            background: radial-gradient(circle at top left, #2c0a0a 0%, #0f0f0f 50%);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            padding: 40px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #FF0000, #FF4D4D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 18px 25px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.1);
+        }
+
+        .format-select {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .format-option {
+            flex: 1;
+        }
+
+        .format-option input {
+            display: none;
+        }
+
+        .format-label {
+            display: block;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .format-option input:checked + .format-label {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 10px 20px -10px rgba(255, 0, 0, 0.5);
+        }
+
+        .btn-download {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -10px rgba(255, 0, 0, 0.6);
+        }
+
+        .btn-download:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+            color: #FF4D4D;
+            font-weight: 600;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        .status-msg {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .status-error {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff4d4d;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+        }
+
+        /* Decorative circles */
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 1;
+        }
+
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 0, 0, 0.1);
+            top: -100px;
+            right: -100px;
+        }
+
+        .circle-2 {
+            width: 250px;
+            height: 250px;
+            background: rgba(138, 43, 226, 0.05);
+            bottom: -50px;
+            left: -50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+
+    <div class="container">
+        <h1 class="logo">YTDown</h1>
+        <p class="subtitle">Download YouTube Shorts & Songs in HD</p>
+
+        <div class="input-group">
+            <label for="url">YOUTUBE VIDEO URL</label>
+            <input type="text" id="url" placeholder="https://youtube.com/watch?v=..." required>
+        </div>
+
+        <div class="format-select">
+            <div class="format-option">
+                <input type="radio" id="mp4" name="format" value="mp4" checked>
+                <label for="mp4" class="format-label">Video (MP4)</label>
+            </div>
+            <div class="format-option">
+                <input type="radio" id="mp3" name="format" value="mp3">
+                <label for="mp3" class="format-label">Audio (MP3)</label>
+            </div>
+        </div>
+
+        <button class="btn-download" id="downloadBtn">DOWNLOAD NOW</button>
+
+        <div class="loading" id="loading">Processing download... This may take a moment.</div>
+        <div class="status-msg status-error" id="statusMsg"></div>
+    </div>
+
+    <script>
+        document.getElementById('downloadBtn').addEventListener('click', async () => {
+            const url = document.getElementById('url').value;
+            const format = document.querySelector('input[name="format"]:checked').value;
+            const btn = document.getElementById('downloadBtn');
+            const loading = document.getElementById('loading');
+            const statusMsg = document.getElementById('statusMsg');
+
+            if (!url) {
+                showError("Please enter a valid YouTube URL");
+                return;
+            }
+
+            btn.disabled = true;
+            loading.style.display = 'block';
+            statusMsg.style.display = 'none';
+
+            try {
+                const downloadUrl = `/api/download?url=${encodeURIComponent(url)}&format=${format}`;
+                
+                // We create an invisible link to trigger the download
+                const response = await fetch(downloadUrl);
+                
+                if (!response.ok) {
+                    throw new Error("Download failed. Please check the URL and try again.");
+                }
+
+                const blob = await response.blob();
+                const downloadBlobUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = downloadBlobUrl;
+                
+                // Try to get filename from header
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let fileName = `video.${format}`;
+                if (contentDisposition && contentDisposition.indexOf('filename=') !== -1) {
+                    fileName = contentDisposition.split('filename=')[1].replace(/["]/g, '');
+                }
+                
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(downloadBlobUrl);
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                btn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+
+        function showError(msg) {
+            const statusMsg = document.getElementById('statusMsg');
+            statusMsg.textContent = msg;
+            statusMsg.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
