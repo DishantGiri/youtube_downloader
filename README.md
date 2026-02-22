@@ -41,7 +41,24 @@ A Spring Boot application that uses Python's `pytube` library to download YouTub
 - `downloads/`: Temporary folder where videos are stored before being streamed to you.
 
 ## Note on Pytube
-YouTube frequently updates its API, which may cause `pytube` to break. If you encounter issues, try updating pytube:
+YouTube frequently updates its API, which may cause `pytube` to break. If you encounter issues, try updating pytubefix (which we currently use as it is more stable):
 ```bash
-pip install --upgrade pytube
+pip install --upgrade pytubefix
 ```
+
+## Running with Docker
+
+You can also run this application using Docker:
+
+1. **Build the image**:
+   ```bash
+   docker build -t youtube-downloader .
+   ```
+
+2. **Run the container**:
+   ```bash
+   docker run -d -p 8070:8070 --name yt-downloader youtube-downloader
+   ```
+
+3. **Access the application**:
+   Open `http://localhost:8070` in your browser.
