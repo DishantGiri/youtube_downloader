@@ -28,7 +28,7 @@ A Spring Boot application that uses Python's `pytube` library to download YouTub
 
 ## How to Use
 
-1. Open your browser and go to `http://localhost:8081`
+1. Open your browser and go to `http://localhost:8070`
 2. Paste a YouTube URL (Video or Short).
 3. Select the format (MP4 for Video, MP3 for Audio).
 4. Click **DOWNLOAD NOW**.
